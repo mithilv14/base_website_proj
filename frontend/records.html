@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Clinical Records</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">✎</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>Diagnosis records</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>
+            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title">
+                    <h2>Diagnosis &amp; Medical Records</h2>
+                    <p>Capture symptoms, diagnosis notes, and browse clinical history for any patient.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 FINISH CONSULTATION BANNER
+                 Shown when a patient_id is in the URL (doctor opened via
+                 "Start Session"). Lets doctor mark the appointment as
+                 "completed" once they are done with diagnosis + prescriptions.
+            ============================================================ -->
+            <div id="consultationBanner" class="glass-card panel hidden"
+                style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; border-left: 4px solid #2563EB; padding: 16px 24px;">
+                <div>
+                    <strong id="consultationPatientName" style="font-size:1rem;">Active Session</strong>
+                    <p style="margin:4px 0 0; color:var(--text-muted); font-size:0.85rem;">
+                        Session in progress — save the record and prescriptions, then finish the consultation.
+                    </p>
+                </div>
+                <button id="finishConsultationBtn" class="btn btn-accent"
+                    style="white-space:nowrap; min-width:180px; font-size:0.9rem;">
+                    ✔ Finish Consultation
+                </button>
+            </div>
+
+            <section class="grid-two">
+                <!-- Create Record form -->
+                <div class="glass-card panel">
+                    <div class="section-header">
+                        <h3>Create Diagnosis Record</h3>
+                        <span class="pill">JWT Protected</span>
+                    </div>
+                    <form id="recordForm">
+                        <div class="form-grid">
+                            <select id="recordPatient" class="select" required></select>
+                            <select id="recordVisitType" class="select" required>
+                                <option value="checkup">Checkup</option>
+                                <option value="prescription">Prescription</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                            <input id="recordSymptoms" class="input" type="text"
+                                placeholder="Symptoms (comma-separated)" required>
+                            <input id="recordDiagnosis" class="input" type="text" placeholder="Diagnosis" required>
+                            <textarea id="recordNotes" class="textarea" placeholder="Clinical notes"></textarea>
+                        </div>
+                        <div style="margin-top: 18px; display:flex; gap:10px; align-items:center;">
+                            <button class="btn btn-primary" type="submit">Save Record</button>
+                            <button class="btn" type="button" id="clearDraftBtn"
+                                style="color:var(--text-muted);">Clear Draft</button>
+                            <span id="draftIndicator"
+                                style="font-size:0.78rem; color:#2563EB; display:none;">● Draft saved</span>
+                        </div>
+                    </form>
+                </div>
+
+            </section>
+
+            <section class="glass-card panel" style="margin-top:0;">
+                <div class="section-header">
+                    <h3>Past Records</h3>
+                    <span class="pill">Latest first</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Type</th>
+                                <th>Symptoms</th>
+                                <th>Diagnosis</th>
+                                <th>Notes</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/records.js"></script>
+</body>
+
+</html>

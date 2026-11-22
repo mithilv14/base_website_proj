@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Patients</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">☤</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>View past records</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title">
+                    <h2>View Past Records</h2>
+                    <p>Search, add, update, and review the patient base from one workspace.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <section class="glass-card panel">
+                <div class="search-row">
+                    <input id="searchPatients" class="input" type="search" placeholder="Search by patient name or ID">
+                    <button id="openPatientModal" class="btn btn-primary" type="button">+ Add Patient</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Contact</th>
+                                <th>Blood Group</th>
+                                <th>Address</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <div class="section-header">
+                <h3 id="patientModalTitle">Add Patient</h3>
+                <button id="closePatientModal" class="btn btn-muted" type="button">Close</button>
+            </div>
+            <form id="patientForm">
+                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <input id="patientName" class="input" type="text" placeholder="Full name" required>
+                    <input id="patientAge" class="input" type="number" min="1" placeholder="Age" required>
+                    <select id="patientGender" class="select" required>
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input id="patientContact" class="input" type="text" placeholder="Contact number" required>
+                    <input id="patientBloodGroup" class="input" type="text" placeholder="Blood group" required>
+                    <input id="patientAddress" class="input" type="text" placeholder="Address" required>
+                </div>
+                <div style="margin-top: 18px;">
+                    <button class="btn btn-accent" type="submit">Save Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="patientTimelineModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="section-header">
+                <h3 id="patientTimelineTitle">Patient Timeline</h3>
+                <button id="closePatientTimelineModal" class="btn btn-muted" type="button">Close</button>
+            </div>
+
+            <style>
+                .timeline {
+                    border-left: 2px solid #e0e0e0;
+                    padding-left: 20px;
+                    list-style: none;
+                    margin-left: 10px;
+                    padding-top: 10px;
+                }
+
+                .timeline-item {
+                    position: relative;
+                    margin-bottom: 24px;
+                    padding-bottom: 1px;
+                }
+
+                .timeline-dot {
+                    position: absolute;
+                    left: -27px;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background: #ccc;
+                    top: 4px;
+                    border: 2px solid white;
+                    box-shadow: 0 0 0 2px #ccc;
+                }
+
+                .timeline-dot.checkup {
+                    background: #2563EB;
+                    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
+                    border-color: white;
+                }
+
+                .timeline-dot.prescription {
+                    background: #F59E0B;
+                    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+                    border-color: white;
+                }
+
+                .timeline-dot.emergency {
+                    background: #EF4444;
+                    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+                    border-color: white;
+                }
+
+                body.dark-mode .timeline-dot {
+                    border-color: #333;
+                }
+
+                .timeline-content {
+                    background: #f9f9f9;
+                    padding: 14px;
+                    border-radius: 8px;
+                    border: 1px solid #efefef;
+                }
+
+                body.dark-mode .timeline-content {
+                    background: #2a2a2a;
+                    border-color: #444;
+                }
+
+                .timeline-date {
+                    font-size: 0.85rem;
+                    color: #888;
+                    margin-bottom: 6px;
+                }
+
+                .timeline-box-title {
+                    font-weight: 600;
+                    font-size: 1.05rem;
+                    margin-bottom: 4px;
+                    display: flex;
+                    justify-content: space-between;
+                }
+
+                .timeline-box-doc {
+                    font-size: 0.9rem;
+                    color: #555;
+                }
+
+                body.dark-mode .timeline-box-doc {
+                    color: #bbb;
+                }
+            </style>
+
+            <div id="patientTimelineContainer" style="max-height: 400px; overflow-y: auto;">
+                <!-- Timeline items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/patients.js"></script>
+</body>
+
+</html>

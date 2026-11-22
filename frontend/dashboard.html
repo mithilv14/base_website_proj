@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">✚</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>Medical operations hub</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>
+            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title" id="dashboardTitle">
+                    <h2>Dashboard Overview</h2>
+                    <p>Real-time hospital metrics, diagnosis trends, and recent clinical activity.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 ADMIN VIEW: Full Analytics + System Overview
+                 Shown only when role === "admin"
+            ======================================================== -->
+            <div id="adminView" class="role-view hidden">
+                <section class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <span>Total Patients</span>
+                        <strong id="totalPatients">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Total Records</span>
+                        <strong id="totalRecords">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Total Prescriptions</span>
+                        <strong id="totalPrescriptions">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Active Doctors</span>
+                        <strong id="activeDoctors">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Total Revenue</span>
+                        <strong id="totalRevenue">₹0</strong>
+                    </div>
+                </section>
+
+                <section class="chart-grid" style="margin-bottom: 24px; grid-template-columns: 1.5fr 1fr 1fr;">
+                    <div class="glass-card panel">
+                        <div class="panel-header">
+                            <h3>Patient Registrations — Last 6 Months</h3>
+                            <span class="pill">Monthly</span>
+                        </div>
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="patientTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card panel">
+                        <div class="panel-header">
+                            <h3>Patient Gender Split</h3>
+                            <span class="pill">All Patients</span>
+                        </div>
+                        <div style="max-height: 320px; width: 100%; display: flex; justify-content: center; position: relative;">
+                            <div id="doughnutCenterText"
+                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+                                <span style="font-size: 2.2rem; font-weight: bold; color: var(--text);" id="genderTotalCount">0</span>
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">Patients</span>
+                            </div>
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card panel">
+                        <div class="panel-header">
+                            <h3>Top Diagnosed Conditions</h3>
+                            <span class="pill">Aggregate</span>
+                        </div>
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="diseaseChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card panel">
+                    <div class="section-header">
+                        <h3>Recent Activity</h3>
+                        <span class="pill">Latest diagnosis updates</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Diagnosis</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="adminRequestsSection" class="glass-card panel hidden" style="margin-top: 24px;">
+                    <div class="section-header">
+                        <h3>Signup Requests</h3>
+                        <span class="pill">Admin approval queue</span>
+                    </div>
+                    <div class="helper-text" style="margin-bottom: 16px;">
+                        New admin, doctor, and receptionist accounts stay blocked from login until an existing admin approves them.
+                    </div>
+                    <div class="actions" style="margin-bottom: 16px; gap: 10px;">
+                        <button id="adminRequestsTabBtn" class="btn btn-primary" type="button" onclick="showSignupRequestTab('admin')">Admin Requests</button>
+                        <button id="doctorRequestsTabBtn" class="btn" type="button" onclick="showSignupRequestTab('doctor')">Doctor Requests</button>
+                        <button id="receptionistRequestsTabBtn" class="btn" type="button" onclick="showSignupRequestTab('receptionist')">Receptionist Requests</button>
+                    </div>
+                    <div id="adminRequestsTab" class="signup-request-tab">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Requested At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminRequestsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="doctorRequestsTab" class="signup-request-tab hidden">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Requested At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doctorRequestsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="receptionistRequestsTab" class="signup-request-tab hidden">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Requested At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="receptionistRequestsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="auditLogsSection" class="glass-card panel hidden" style="margin-top: 24px;">
+                    <div class="section-header">
+                        <h3>Recent Activity Log</h3>
+                        <span class="pill">Audit Trail</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
+                                    <th>Target</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ========================================================
+                 DOCTOR VIEW: Task-focused — My Patients, Consultations
+                 Shown only when role === "doctor"
+                 All data is filtered by doctor's own ID on the backend
+            ======================================================== -->
+            <div id="doctorView" class="role-view hidden">
+                <!-- KPI Cards: Only doctor-relevant metrics -->
+                <section class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <span>Patients Treated</span>
+                        <strong id="docPatientsTreated">0</strong>
+                    </div>
+                </section>
+
+                <!-- My Appointments Today: Most important section, at top -->
+                <section class="glass-card panel" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <h3>My Appointments Today</h3>
+                        <span class="pill" id="docTodayDate">Today</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docApptsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Doctor statistics -->
+                <section class="glass-card panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h3>Top Diagnosed Conditions</h3>
+                        <span class="pill">My Statistics</span>
+                    </div>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="docConditionChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Recent Diagnoses -->
+                <section class="glass-card panel">
+                    <div class="section-header">
+                        <h3>Recent Diagnoses</h3>
+                        <span class="pill">Last 5</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Diagnosis</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docRecentDiagnosesBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+                </section>
+            </div>
+
+            <!-- ========================================================
+                 RECEPTIONIST VIEW: Operations-focused — Patient flow
+                 Shown only when role === "receptionist"
+            ======================================================== -->
+            <div id="receptionistView" class="role-view hidden">
+                <section class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <span>Total Patients</span>
+                        <strong id="recepTotalPatients">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Appointments Today</span>
+                        <strong id="recepApptsToday">0</strong>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span>Pending Invoices</span>
+                        <strong id="recepPendingInvoices" style="color:#EF4444;">0</strong>
+                    </div>
+                </section>
+
+                <!-- Today's Appointments: Main section at top -->
+                <section class="glass-card panel" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <h3>Today's Appointments</h3>
+                        <div class="actions">
+                            <a href="/appointments.html" class="btn btn-primary" style="font-size: 0.8rem; text-decoration: none; display: inline-block; padding: 6px 14px;">+ Book New</a>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recepApptsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Bottom: Patient Registrations chart + Queue + Quick Actions -->
+                <section class="chart-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 24px;">
+                    <!-- Patient Registrations chart: Kept from admin -->
+                    <div class="glass-card panel">
+                        <div class="panel-header">
+                            <h3>Patient Registrations</h3>
+                            <span class="pill">Last 6 months</span>
+                        </div>
+                        <div style="position: relative; height: 260px; width: 100%;">
+                            <canvas id="recepTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Global Upcoming Appointments (Across all days) -->
+                    <div class="glass-card panel">
+                        <div class="section-header">
+                            <h3>Upcoming Appointments</h3>
+                            <span class="pill" id="upcomingCount">Checked-in</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Doctor</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upcomingApptsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Panel -->
+                    <div class="glass-card panel">
+                        <div class="section-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px;">
+                            <a href="/patients.html" class="glass-card stat-card" style="text-align:center; cursor:pointer; text-decoration:none; padding:16px 12px;">
+                                <div style="font-size:1.8rem; margin-bottom:6px;">👤</div>
+                                <span style="font-size:0.8rem; font-weight:600;">Add Patient</span>
+                            </a>
+                            <a href="/appointments.html" class="glass-card stat-card" style="text-align:center; cursor:pointer; text-decoration:none; padding:16px 12px;">
+                                <div style="font-size:1.8rem; margin-bottom:6px;">📅</div>
+                                <span style="font-size:0.8rem; font-weight:600;">Book Appointment</span>
+                            </a>
+                            <a href="/appointments.html" class="glass-card stat-card" style="text-align:center; cursor:pointer; text-decoration:none; padding:16px 12px;">
+                                <div style="font-size:1.8rem; margin-bottom:6px;">✅</div>
+                                <span style="font-size:0.8rem; font-weight:600;">Check-in Patient</span>
+                            </a>
+                            <a href="/billing.html" class="glass-card stat-card" style="text-align:center; padding:16px 12px; cursor:pointer; text-decoration:none;">
+                                <div style="font-size:1.8rem; margin-bottom:6px;">💳</div>
+                                <span style="font-size:0.8rem; font-weight:600;">Billing Centre</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

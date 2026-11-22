@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Pharmacy</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .clickable-row:hover {
+            background-color: var(--bg);
+            transition: background-color 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">⚗</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>Pharmacy control</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title">
+                    <h2>Pharmacy & Prescriptions</h2>
+                    <p>Track medicine stock, add inventory, and generate prescriptions with live totals.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 FINISH CONSULTATION BANNER
+                 Shown when a patient_id is in the URL (doctor opened via
+                 "Start Session").
+            ============================================================ -->
+            <div id="consultationBanner" class="glass-card panel hidden"
+                style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; border-left: 4px solid #2563EB; padding: 16px 24px;">
+                <div>
+                    <strong id="consultationPatientName" style="font-size:1.1rem;">Active Session</strong>
+                    <p style="margin:4px 0 0; color:var(--muted); font-size:0.85rem;">
+                        Session in progress — lock active for prescriptions.
+                    </p>
+                </div>
+                <button id="finishConsultationBtn" class="btn btn-accent"
+                    style="white-space:nowrap; min-width:180px; font-size:0.9rem;">
+                    ✔ Finish Consultation
+                </button>
+            </div>
+
+            <section class="grid-two">
+                <div class="glass-card panel">
+                    <div class="section-header">
+                        <h3>Add Medicine</h3>
+                        <span class="pill">Inventory</span>
+                    </div>
+                    <form id="medicineForm">
+                        <div class="form-grid">
+                            <input id="medicineName" class="input" type="text" placeholder="Medicine name" required>
+                            <input id="medicinePrice" class="input" type="number" min="0" step="0.01" placeholder="Price" required>
+                            <input id="medicineStock" class="input" type="number" min="0" placeholder="Stock" required>
+                        </div>
+                        <div style="margin-top: 18px;">
+                            <button class="btn btn-primary" type="submit">Save Medicine</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="glass-card panel">
+                    <div class="section-header">
+                        <h3>Create Prescription</h3>
+                        <span class="pill" id="prescriptionTotal">Rs. 0.00</span>
+                    </div>
+                    <form id="prescriptionForm">
+                        <div class="form-grid">
+                            <select id="prescriptionPatient" class="select" required></select>
+                        </div>
+                        <div id="prescriptionItems" class="prescription-list"></div>
+                        <div class="toolbar" style="margin-top: 14px;">
+                            <button id="addPrescriptionRow" class="btn btn-muted" type="button">+ Add Medicine</button>
+                            <button class="btn btn-accent" type="submit">Create Prescription</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="glass-card panel" style="margin-bottom: 24px;">
+                <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="display: inline-block; margin-right: 8px;">Medicine Inventory</h3>
+                        <span class="pill">Live stock status</span>
+                    </div>
+                    <div style="position: relative; width: 280px;">
+                        <input id="medicineSearch" class="input" type="text" placeholder="Search medicine by name..." style="width: 100%; padding-right: 32px; border-radius: 20px;">
+                        <button id="clearMedicineSearch" type="button" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none;">&times;</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medicinesTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="glass-card panel">
+                <div class="section-header">
+                    <h3>Prescription History</h3>
+                    <span class="pill">Dispensing log</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Medicines</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prescriptionsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="medicineDetailModal" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
+        <div class="glass-card panel" style="width: 100%; max-width: 400px; position: relative;">
+            <button id="closeMedicineModal" style="position: absolute; right: 16px; top: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            <h3 id="modalMedicineName" style="margin-top: 0; margin-bottom: 16px; padding-right: 24px;">Medicine Name</h3>
+            <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 16px;">
+            <div style="margin-bottom: 8px;"><strong>Price:</strong> Rs. <span id="modalMedicinePrice">0.00</span></div>
+            <div style="margin-bottom: 8px;"><strong>Stock:</strong> <span id="modalMedicineStock">0</span> units</div>
+            <div style="margin-bottom: 24px;"><strong>Status:</strong> <span id="modalMedicineStatus" class="pill">Status</span></div>
+            
+            <h4 style="margin-bottom: 12px; margin-top: 0;">── Restock ──</h4>
+            <form id="restockForm" style="display: flex; gap: 12px;">
+                <input type="hidden" id="restockMedicineId">
+                <input id="restockQty" class="input" type="number" min="1" placeholder="Quantity to add" required style="flex: 1;">
+                <button type="submit" class="btn btn-accent">+ Add to Stock</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/pharmacy.js"></script>
+</body>
+</html>

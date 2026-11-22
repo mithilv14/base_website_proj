@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body.auth-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .auth-header {
+            margin-bottom: 30px;
+        }
+
+        .auth-header .brand-badge {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 16px;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .auth-header h1 {
+            font-size: 1.8rem;
+            margin: 0 0 8px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .toggle-text {
+            margin-top: 24px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .toggle-link {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="glass-card auth-container">
+        <div class="auth-header">
+            <div class="brand-badge">✚</div>
+            <h1 id="authTitle">Welcome to SMRMS</h1>
+            <p id="authSubtitle">Smart Medical Record Management</p>
+        </div>
+
+        <div id="loginView" class="form-container">
+            <form id="loginForm">
+                <div class="auth-input-group">
+                    <input id="loginEmail" class="input" type="email" placeholder="Email Address" required>
+                    <div style="position: relative; width: 100%;">
+                        <input id="password" class="input" type="password" placeholder="Password" required style="width: 100%; padding-right: 40px;">
+                        <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #94A3B8;">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1.05rem;">Sign In</button>
+            </form>
+            <div class="toggle-text">
+                Need an account? <span id="showSignup" class="toggle-link">Request Access</span>
+            </div>
+        </div>
+
+        <div id="signupView" class="form-container hidden">
+            <form id="signupForm">
+                <div class="auth-input-group">
+                    <input id="signupName" class="input" type="text" placeholder="Full Name" required>
+                    <input id="signupEmail" class="input" type="email" placeholder="Email Address" required>
+                    <input id="signupPassword" class="input" type="password" placeholder="Password (Min 6)" minlength="6" required>
+                    <select id="signupRole" class="select" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">System Admin</option>
+                        <option value="doctor">Doctor</option>
+                        <option value="receptionist">Receptionist</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width: 100%; padding: 12px; font-size: 1.05rem;">Create Account</button>
+            </form>
+            <div class="toggle-text">
+                Already have an account? <span id="showLogin" class="toggle-link">Sign In here</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof getToken === "function" && getToken()) {
+                window.location.href = `${window.location.origin}/dashboard.html`;
+                return;
+            }
+
+            const loginView = document.getElementById("loginView");
+            const signupView = document.getElementById("signupView");
+            const authTitle = document.getElementById("authTitle");
+            const authSubtitle = document.getElementById("authSubtitle");
+
+            const toggleBtn = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("password");
+            toggleBtn.addEventListener("click", () => {
+                const isHidden = passwordInput.type === "password";
+                passwordInput.type = isHidden ? "text" : "password";
+                toggleBtn.textContent = isHidden ? "🙈" : "👁";
+                toggleBtn.style.color = isHidden ? "#2563EB" : "#94A3B8";
+            });
+
+            document.getElementById("showSignup").addEventListener("click", () => {
+                loginView.classList.add("hidden");
+                signupView.classList.remove("hidden");
+                authTitle.textContent = "Request Access";
+                authSubtitle.textContent = "Join the clinical network";
+            });
+
+            document.getElementById("showLogin").addEventListener("click", () => {
+                signupView.classList.add("hidden");
+                loginView.classList.remove("hidden");
+                authTitle.textContent = "Welcome to SMRMS";
+                authSubtitle.textContent = "Smart Medical Record Management";
+            });
+
+            document.getElementById("loginForm").addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const email = document.getElementById("loginEmail").value.trim();
+                const password = document.getElementById("password").value.trim();
+                if (!email || !password) {
+                    showToast("Email and password are required.", "error"); return;
+                }
+
+                try {
+                    setLoading && setLoading(true);
+                    const response = await fetch(`${window.location.origin}/api/auth/login`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const payload = await response.json();
+                    if (!response.ok) throw new Error(payload.message);
+                    saveSession && saveSession(payload);
+                    showToast("Login successful.");
+                    setTimeout(() => { window.location.href = `/dashboard.html`; }, 700);
+                } catch (error) {
+                    showToast(error.message, "error");
+                } finally {
+                    setLoading && setLoading(false);
+                }
+            });
+
+            document.getElementById("signupForm").addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const payload = {
+                    name: document.getElementById("signupName").value.trim(),
+                    email: document.getElementById("signupEmail").value.trim(),
+                    password: document.getElementById("signupPassword").value.trim(),
+                    role: document.getElementById("signupRole").value,
+                };
+
+                if (Object.values(payload).some((value) => !value)) {
+                    showToast("Please complete every signup field.", "error"); return;
+                }
+
+                try {
+                    setLoading && setLoading(true);
+                    const response = await fetch(`${window.location.origin}/api/auth/signup`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message);
+                    showToast(result.message || "Account creation requested. Awaiting admin approval.");
+                    document.getElementById("signupForm").reset();
+                    document.getElementById("showLogin").click();
+                } catch (error) {
+                    showToast(error.message, "error");
+                } finally {
+                    setLoading && setLoading(false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Billing Center</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">💳</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>Financial center</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>
+            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title">
+                    <h2>Clinic Billing & Invoices</h2>
+                    <p>Manage patient payments, view consultation fees, and track revenue.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <section class="stats-grid">
+                <div class="glass-card stat-card">
+                    <span>Pending Invoices</span>
+                    <strong id="billingPendingCount">0</strong>
+                </div>
+                <div class="glass-card stat-card">
+                    <span>Total Revenue Paid</span>
+                    <strong id="billingTotalPaid">₹0</strong>
+                </div>
+            </section>
+
+            <section class="glass-card panel" style="margin-top:24px;">
+                <div class="section-header">
+                    <h3>Invoice List</h3>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="billingSearch" class="input" placeholder="Search patient..." style="width:250px; font-size:0.85rem; padding: 6px 12px;">
+                        <select id="statusFilter" class="select" style="font-size:0.85rem; width:150px;">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billingTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="glass-card modal-content" style="max-width:500px;">
+            <div class="section-header">
+                <h3>Invoice Details</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div id="invoiceDetailArea" style="margin-top:20px;"></div>
+            <div id="invoiceFooter" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end;">
+                <button id="payInvoiceBtn" class="btn btn-primary" style="background:#10B981; border:0;">Record Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/billing.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMRMS | Appointments</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-badge">📅</div>
+                <div>
+                    <h1>SMRMS</h1>
+                    <p>Schedule</p>
+                </div>
+            </div>
+            <nav class="nav-links"></nav>            <div class="sidebar-footer">
+                <button id="exportCsvBtn" class="theme-toggle" type="button">📥 Export to CSV</button>
+                <button id="logoutBtn" class="logout-btn" type="button">⇦ Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="page-title">
+                    <h2>Appointments</h2>
+                    <p>Manage and track patient scheduling.</p>
+                </div>
+                <div class="glass-card panel user-chip">
+                    <strong id="userName">User</strong><br>
+                    <small id="userRole">ROLE</small>
+                </div>
+            </div>
+
+            <section class="glass-card panel">
+                <div class="search-row">
+                    <h3 style="margin:0;">Upcoming Schedule</h3>
+                    <button id="openApptModal" class="btn btn-primary" type="button">+ Book Appointment</button>
+                </div>
+                <div class="table-wrap" style="margin-top:20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apptTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="apptModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="section-header">
+                <h3 id="apptModalTitle">Book Appointment</h3>
+                <button id="closeApptModal" class="btn btn-muted" type="button">Close</button>
+            </div>
+            <form id="apptForm">
+                <div class="form-grid">
+                    <select id="apptPatient" class="select" required></select>
+                    <select id="apptDoctor" class="select" required></select>
+                    <input id="apptDate" class="input" type="date" required>
+                    <input id="apptTime" class="input" type="time" required>
+                </div>
+                <div style="margin-top: 18px;">
+                    <button class="btn btn-accent" type="submit">Book Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/appointments.js"></script>
+</body>
+</html>
